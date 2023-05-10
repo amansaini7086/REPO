@@ -1,0 +1,961 @@
+EXPERIMENT-2
+
+CLIENT SERVER COMMUNICATION (SOCKET PROGRAMMING)
+AIM: To Implement Client Server Communication
+PROCEDURE:
+CLIENT SIDE
+1. Start the program.
+2. Create a socket which binds the Ip address of server and the port address to acquire
+service.
+3. After establishing connection send a data to server.
+4. Receive and print the same data from server.
+5. Close the socket.
+6. End the program.
+SERVER SIDE
+1. Start the program.
+2. Create a server socket to activate the port address.
+3. Create a socket for the server socket which accepts the connection.
+4. After establishing connection receive the data from client.
+5. Print and send the same data to client.
+6. Close the socket.
+7. End the program.
+SOURCE CODE:
+Server
+import java.net.*;
+import java.io.*;
+import java.util.*;
+class dateserver
+{
+public static void main(String args[])
+{
+ServerSocket ss;
+Socket s;
+PrintStream ps;
+DataInputStream dis;
+String inet;
+
+try
+{
+ss = new ServerSocket(8020);
+while (true)
+{
+s = ss.accept();
+ps = new PrintStream(s.getOutputStream());
+Date d = new Date();
+ps.println(d);
+dis = new DataInputStream(s.getInputStream());
+inet = dis.readLine();
+System.out.println(&quot;THE CLIENT SYSTEM ADDRESS IS:&quot; + inet);
+ps.close();
+}
+}
+catch (IOException e)
+{
+System.out.println(&quot;The Exception is :&quot; + e);
+}
+}
+}
+Client
+import java.net.*;
+import java.io.*;
+class dateclient
+{
+public static void main(String[] args)
+{
+Socket soc;
+DataInputStream dis;
+String sdate;
+PrintStream ps;
+try
+{
+InetAddress ia=InetAddress.getLocalHost();
+soc=new Socket(ia,8020);
+dis=new DataInputStream(soc.getInputStream());
+sdate=dis.readLine();
+System.out.println(&quot;THE date in the server is:&quot;+sdate);
+ps=new PrintStream(soc.getOutputStream());
+ps.println(ia);
+}
+catch(IOException e)
+{
+System.out.println(&quot;THE EXCEPTION is: &quot;+e);
+}
+}
+}
+
+OUTPUT:
+
+RESULT: Client Server Communication using socket programming has been implemented
+successfully.
+
+EXPERIMENT-3
+
+CODE FOR SIMULATING PING AND TRACEROUTE COMMANDS
+AIM: To Write The java program for simulating ping and traceroute commands 
+PROCEDURE:
+1.Start the program. 
+2.Get the frame size from the user 
+3.To create the frame based on the user request. 
+4.To send frames to server from the client side. 
+5.If your frames reach the server it will send ACK signal to client otherwise it will send
+NACK signal to client. 
+6.Stop the program
+SOURCE CODE:
+Server
+import java.io.*;
+import java.net.*;
+class pingserver
+{
+public static void main(String args[])
+{
+try
+{
+String str;
+System.out.print(&quot; Enter the IP Address to be Ping : &quot;);
+DataInputStream dis=new DataInputStream(System.in);
+String ip=dis.readLine();
+Runtime H=Runtime.getRuntime();
+Process p=H.exec(&quot;ping &quot; + ip);
+InputStream in=p.getInputStream();
+DataInputStream buf2=new DataInputStream(in);
+while((str=buf2.readLine())!=null)
+{
+System.out.println(&quot; &quot; + str);
+}
+}
+catch(Exception e)
+{
+System.out.println(e.getMessage());
+}
+}}
+Client
+import java.io.*;
+import java.net.*;
+public class traceroutecmd
+
+{
+     public static void runSystemCommand(String command)
+     {
+          try
+          {
+              Process p = Runtime.getRuntime().exec(command);
+DataInputStream inputstream=new DataInputStream(p.getInputStream());
+              
+              String s = &quot;&quot;;
+              while ((s = inputstream.readLine()) != null)
+                   System.out.println(s);
+          }
+          catch (Exception e)
+          {
+          }}
+     public static void main(String[] args)
+     {  
+          String ip = &quot;www.google.co.in&quot;;
+        
+        
+          runSystemCommand(&quot;tracert &quot; + ip);
+     }
+}
+OUTPUT
+
+RESULT:
+Thus the program was implementing to simulating ping and traceroute commands.
+
+EXPERIMENT-4
+
+CREATE SOCKET FOR HTTP,TO WEBPAGE UPLOAD AND DOWNLOAD
+AIM: To write a java program for socket for HTTP for web page upload and download . 
+
+PROCEDURE:
+1.Start the program. 
+2.Get the frame size from the user 
+3.To create the frame based on the user request. 
+4.To send frames to server from the client side.
+5.If your frames reach the server it will send ACK signal to client otherwise it will send
+NACK signal to client.
+6.Stop the program
+SOURCE CODE:
+Server
+import java.net.*;
+import java.io.*;
+import java.awt.image.*;
+import javax.imageio.*;
+import javax.swing.*;
+class Server {
+public static void main(String args[]) throws Exception{
+ServerSocket server=null;
+Socket socket;
+server=new ServerSocket(4000);
+System.out.println(&quot;Server Waiting for image&quot;);
+socket=server.accept(); System.out.println(&quot;Client connected.&quot;);
+InputStream in = socket.getInputStream();
+DataInputStream dis = new DataInputStream(in);
+int len = dis.readInt();
+System.out.println(&quot;Image Size: &quot; + len/1024 + &quot;KB&quot;); byte[] data = new byte[len];
+dis.readFully(data);
+dis.close();
+in.close();
+InputStream ian = new ByteArrayInputStream(data);
+BufferedImage bImage = ImageIO.read(ian);
+JFrame f = new JFrame(&quot;Server&quot;);
+ImageIcon icon = new ImageIcon(bImage);
+JLabel l = new JLabel();
+l.setIcon(icon);
+f.add(l);
+f.pack();
+f.setVisible(true);
+}}
+Client
+import javax.swing.*;
+
+import java.net.*;
+import java.awt.image.*;
+import javax.imageio.*;
+import java.io.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException; import
+javax.imageio.ImageIO;
+public class Client{
+public static void main(String args[]) throws Exception{
+Socket soc;
+BufferedImage img = null;
+soc=new Socket(&quot;localhost&quot;,4000);
+System.out.println(&quot;Client is running. &quot;);
+try {
+System.out.println(&quot;Reading image from disk. &quot;);
+img = ImageIO.read(new File(&quot;dog.jpg&quot;));
+ByteArrayOutputStream baos = new ByteArrayOutputStream();
+ImageIO.write(img, &quot;jpg&quot;, baos);
+baos.flush();
+byte[] bytes = baos.toByteArray();
+baos.close();
+System.out.println(&quot;Sending image to server. &quot;);
+OutputStream out = soc.getOutputStream();
+DataOutputStream dos = new DataOutputStream(out);
+dos.writeInt(bytes.length);
+dos.write(bytes, 0, bytes.length);
+System.out.println(&quot;Image sent to server. &quot;);
+dos.close();
+out.close();
+}catch (Exception e) { System.out.println(&quot;Exception: &quot; + e.getMessage());
+soc.close();
+}
+soc.close();
+}}
+
+OUTPUT
+
+RESULT: Thus the program was implementing to socket for HTTP for web page upload and
+download.
+
+EXPERIMENT-5
+
+SIMULATION OF ERROR CORRECTION CODE (CRC)
+
+AIM: To Simulation of Error Correction Code using C++
+
+PROCEDURE:
+1. Open the editor and type the program for error detection 
+2. Get the input in the form of bits. 
+3. Append the redundancy bits. 
+4. Divide the appended data using a divisor polynomial. 
+5. The resulting data should be transmitted to the receiver. 
+6. At the receiver the received data is entered. 
+7. The same process is repeated at the receiver.
+8. If the remainder is zero there is no error otherwise there is some error in the received bits 
+9. Run the program.
+SOURCE CODE:
+import java.io.*;
+class CRC
+{
+public static void main(String args[]) throws IOException
+{
+ 
+ System.out.println(&quot;Enter Generator:&quot;);
+ DataInputStream br=new DataInputStream(System.in);
+ String gen = br.readLine();
+ System.out.println(&quot;Enter Data:&quot;);
+ String data = br.readLine();
+ String code = data;
+ while(code.length() &lt; (data.length() + gen.length() - 1))
+{
+ code = code + &quot;0&quot;;
+} 
+code = data + div(code,gen);
+ System.out.println(&quot;The transmitted Code Word is: &quot; + code);
+ System.out.println(&quot;Please enter the received Code Word: &quot;);
+ String rec = br.readLine();
+ if(Integer.parseInt(div(rec,gen)) == 0)
+ System.out.println(&quot;The received code word contains no errors.&quot;);
+ else
+ System.out.println(&quot;The received code word contains errors.&quot;);
+}
+static String div(String num1,String num2)
+{
+ int pointer = num2.length();
+ String result = num1.substring(0, pointer);
+ String remainder = &quot;&quot;;
+ for(int i = 0; i &lt; num2.length(); i++)
+
+ {
+ if(result.charAt(i) == num2.charAt(i))
+ remainder += &quot;0&quot;;
+ else
+ remainder += &quot;1&quot;;
+ }
+ while(pointer &lt; num1.length())
+ {
+ if(remainder.charAt(0) == &#39;0&#39;)
+ {
+ remainder = remainder.substring(1, remainder.length());
+ remainder = remainder + String.valueOf(num1.charAt(pointer));
+ pointer++;
+ }
+ result = remainder;
+ remainder = &quot;&quot;;
+ for(int i = 0; i &lt; num2.length(); i++)
+ {
+ if(result.charAt(i) == num2.charAt(i))
+ remainder += &quot;0&quot;;
+ else
+ remainder += &quot;1&quot;;
+ }
+ }
+ return remainder.substring(1,remainder.length());
+}
+}
+OUTPUT:
+
+RESULT: Thus the error detection and error correction is implemented successfully.
+
+EXPERIMENT-6
+
+IMPLEMENTATION OF STOP AND WAIT PROTOCOL
+
+AIM: To write a java program to perform stop and wait protocol
+PROCEDURE:
+1.Start the program. 
+2.Get the frame size from the user 
+3.To create the frame based on the user request. 
+4.To send frames to server from the client side.
+5.If your frames reach the server it will send ACK signal to client otherwise it will send
+NACK signal to client. 
+6.Stop the program
+SOURCE CODE:
+Server
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class receiver {
+    public static void main(String args[])
+{
+    String h=&quot;Serverhost&quot;;
+    int q=5000;
+    int i;
+        try
+        {         
+        ServerSocket ss2;
+            ss2 = new ServerSocket(8000);
+            Socket s1 =ss2.accept();
+        DataInputStream dd1= new DataInputStream(s1.getInputStream());
+        Integer i1 =dd1.read();
+        for(i=0;i&lt;i1;i++)
+
+        {
+            ServerSocket ss1;
+            ss1 = new ServerSocket(9000+i);
+            Socket s =ss1.accept();
+        DataInputStream dd= new DataInputStream(s.getInputStream());
+        String sss1 = dd.readUTF();
+            System.out.println(sss1);
+            System.out.println(&quot;Frame &quot;+ i+&quot; received&quot;);
+        DataOutputStream d1 = new DataOutputStream(s.getOutputStream());
+        d1.write(i);
+         System.out.println(&quot;ACK sent for &quot;+ i); 
+        }
+        }
+        catch(Exception ex)
+        {
+         System.out.println(&quot;Error&quot;+ex);
+                }
+}
+}
+Client
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+public class sender {
+public static void main(String args[])
+{
+   int p=9000,i,q=8000;
+    String h=&quot;localhost&quot;;
+    try
+    {
+
+    Scanner scanner = new Scanner(System.in);
+    System.out.print(&quot;Enter number of frames : &quot;);
+    int number = scanner.nextInt();
+    if(number==0)
+    {
+        System.out.println(&quot;No frame is sent&quot;);
+    }
+    else
+            {           
+          Socket s2= new Socket(h,q);
+        DataOutputStream d1 = new DataOutputStream(s2.getOutputStream());
+        d1.write(number);
+          }
+    String str1;
+        for (i=0;i&lt;number;i++)
+        {                 
+    System.out.print(&quot;Enter message : &quot;);
+    String name = scanner.next();
+    System.out.println(&quot;Frame &quot; + i+&quot; is sent&quot;); 
+    Socket s1;
+        s1= new Socket(h,p+i);
+        DataOutputStream d = new DataOutputStream(s1.getOutputStream());
+        d.writeUTF(name);
+        DataInputStream dd= new DataInputStream(s1.getInputStream());
+        Integer sss1 = dd.read();
+        System.out.println(&quot;Ack for :&quot; + sss1 + &quot; is  received&quot;);
+        }
+    }
+    catch(Exception ex)
+
+            {
+                System.out.println(&quot;ERROR :&quot;+ex);
+            }
+} 
+}
+OUTPUT:
+
+RESULT: Thus the program for implementing stop and wait protocol was executed successfully.
+
+EXPERIMENT-7
+
+SIMULATION OF SLIDING WINDOW  PROTOCOL
+
+AIM:  To Implement Simulation of Sliding Window Protocol
+PROCEDURE:  
+1. Start the program.
+2. Get the frame size from the user
+3. To create the frame based on the user request.
+4. To send frames to the server from the client-side.
+5. If your frames reach the server it will send ACK signal to client otherwise
+it will send a NACK signal to the client.
+6. Stop the program
+SOURCE CODE:
+Server
+import java.io.*;
+import java.net.*;
+public class slidesserver
+{
+public static void main(String args[])throws IOException
+{
+byte msg[]=new byte[200];
+ServerSocket ser=new ServerSocket(2000);
+Socket s;
+PrintStream pout;
+DataInputStream in=new DataInputStream(System.in);
+int start,end,l,j=0,i,ws=5,k=0;
+String st,stl[]=new String[100];
+System.out.println(&quot;Type\&quot;Stop\&quot;to exit&quot;);
+
+s=ser.accept();
+pout=new PrintStream(s.getOutputStream());
+DataInputStream rin=new DataInputStream(s.getInputStream());
+System.out.println(&quot;enter data to be send:&quot;);
+while(true)
+{
+st=in.readLine();
+l=st.length();
+start=0;
+end=10;
+j=0;
+if(st.equals(&quot;STOP&quot;))
+{
+pout.println(st);
+break;
+}
+if(l&lt;10)
+{stl[j++]=l+st;
+}
+else
+{
+for(i=l,j=0;i&gt;0;i=i-10,j++)
+{
+stl[j]=(j+1)+st.substring(start,end);
+start=end;
+end=end+10;
+if(end&gt;l)
+
+{
+end=((start-10)+i);
+}}
+System.out.println(&quot;total number of packet&quot;+j);
+}
+pout.println(j);
+for(i=0;i&lt;j;i++)
+{
+pout.println(stl[i]);
+if((i+1)%ws==0)
+{
+System.out.println(rin.readLine());
+}}
+if(i%ws!=0)
+{
+System.out.println(rin.readLine());
+System.out.println(&quot;enter next data to send&quot;);
+}
+}}}
+Client
+import java.io.*;
+import java.net.*;
+public class slideclient
+{
+            public static void main(String args[])throws IOException
+            {
+                 byte msg[]=new byte[200];
+
+                 Socket s=new Socket(InetAddress.getLocalHost(),2000);
+                 DataInputStream in=new DataInputStream(s.getInputStream());
+                 DataInputStream ain=new DataInputStream(System.in);
+                 PrintStream p=new PrintStream(s.getOutputStream());
+                 char ch;
+                 int i=0,ws=5;
+                 while(true)
+                 {
+                           String str,astr;
+                           int j=0;
+                                    i=0;
+                           str=in.readLine();
+                           if(str.equals(&quot;STOP&quot;))
+                                     System.exit(0);
+                           j=Integer.parseInt(str);
+                           for(i=0;i&lt;j;i++)
+                           {
+                                     str=in.readLine();
+                                     System.out.println(str);
+                                     if((i+1)%ws==0)
+                                     {
+                                               System.out.println(&quot;Give the ack by press\&quot;Enter\&quot;key&quot;);
+                                               astr=ain.readLine();
+                                               p.println((i+1)+&quot;ack&quot;);
+                                     }}
+                           if((i%ws)!=0)
+                           {
+
+                                     System.out.println(&quot;Give the ack by press\&quot;Enter\&quot;key&quot;);
+                                     astr=ain.readLine();
+                                     p.println(i+&quot;ack&quot;);}
+                           System.out.println(&quot;All data are recieved and ack&quot;);
+                 }}}
+OUTPUT:
+
+RESULT:  Thus, the above program sliding window protocol was executed and successfully.
+
+EXPERIMENT-8
+SIMULATING ARP PROTOCOLS
+AIM:  To write a java program for simulating ARP protocols using TCP
+PROCEDURE:  
+CLIENT-SIDE
+1. Start the program
+2. Using socket connection is established between client and server.
+3. Get the IP address to be converted into MAC address.
+4. Send this IP address to the server.
+5. Server returns the MAC address to the client.
+SERVER-SIDE
+1. Start the program
+2. Accept the socket which is created by the client.
+3. Server maintains the table in which IP and corresponding MAC addresses are stored.
+4. Read the IP address which is sent by the client.
+5. Map the IP address with its MAC address and return the MAC address to the client.
+SOURCE CODE:
+Server
+import java.io.*; 
+import java.net.*; 
+import java.util.*;
+ class Serverarp
+{
+public static void main(String args[])
+{
+try{
+ServerSocket obj=new ServerSocket(139); 
+
+Socket obj1=obj.accept();
+while(true)
+{
+DataInputStream din=new DataInputStream(obj1.getInputStream()); 
+DataOutputStream dout=new DataOutputStream(obj1.getOutputStream());
+ String str=din.readLine();
+String ip[]={&quot;165.165.80.80&quot;,&quot;165.165.79.1&quot;};
+String mac[]={&quot;6A:08:AA:C2&quot;,&quot;8A:BC:E3:FA&quot;};
+for(int i=0;i&lt;ip.length;i++)
+{
+ if(str.equals(ip[i]))
+{
+dout.writeBytes(mac[i]+&#39;\n&#39;); break;
+}
+}
+obj.close();
+}
+}
+catch(Exception e)
+{
+System.out.println(e);
+} } }
+Client
+import java.io.*;
+ import java.net.*;
+ import java.util.*;
+ class Clientarp
+
+{
+public static void main(String args[])
+{
+try{
+BufferedReader in=new BufferedReader(new InputStreamReader(System.in)); 
+Socket clsct=new Socket(&quot;127.0.0.1&quot;,139);
+DataInputStream din=new DataInputStream(clsct.getInputStream());
+ DataOutputStream dout=new DataOutputStream(clsct.getOutputStream());
+System.out.println(&quot;Enter the Logical address(IP):&quot;);
+String str1=in.readLine(); dout.writeBytes(str1+&#39;\n&#39;); 
+String str=din.readLine();
+System.out.println(&quot;The Physical Address is: &quot;+str); 
+clsct.close();}
+catch (Exception e){
+System.out.println(e);
+}}}
+OUTPUT:
+
+RESULT:  Java program for simulating ARP protocols using TCP have been executed
+successfully.
+
+EXPERIMENT-9
+
+Program for Reverse Address Resolution Protocol (RARP) using UDP
+AIM:  To write a java program for simulating RARP protocols using DCP
+PROCEDURE:  
+CLIENT SIDE
+1. Start the program
+2. using datagram sockets UDP function is established.
+2.Get the MAC address to be converted into IP address.
+3.Send this MAC address to server.
+4.Server returns the IP address to client..
+SERVER SIDE
+1. Start the program
+2. Accept the socket which is created by the client.
+3. Server maintains the table in which IP and corresponding MAC addresses are stored.
+4. Read the IP address which is sent by the client.
+5. Map the IP address with its MAC address and return the MAC address to the client.
+SOURCE CODE:
+Server
+import java.io.*;
+ import java.net.*;
+ import java.util.*; 
+class Serverrarp12
+{
+public static void main(String args[]){
+try{
+DatagramSocket server=new DatagramSocket(1309);
+ while(true)
+
+{
+byte[] sendbyte=new byte[1024]; 
+byte[] receivebyte=new byte[1024];
+DatagramPacket receiver=new DatagramPacket(receivebyte,receivebyte.length);
+server.receive(receiver);
+String str=new String(receiver.getData());
+ String s=str.trim();
+InetAddress addr=receiver.getAddress();
+ int port=receiver.getPort();
+String ip[]={&quot;165.165.80.80&quot;,&quot;165.165.79.1&quot;};
+String mac[]={&quot;6A:08:AA:C2&quot;,&quot;8A:BC:E3:FA&quot;};
+for(int i=0;i&lt;ip.length;i++)
+{
+if(s.equals(mac[i]))
+{
+sendbyte=ip[i].getBytes();
+DatagramPacket sender=newDatagramPacket(sendbyte,sendbyte.length,addr,port);
+server.send(sender); break;
+}
+}
+break;
+}
+}
+catch(Exception e)
+{
+System.out.println(e);
+}
+
+}
+}
+Client
+import java.io.*;
+ import java.net.*;
+ import java.util.*; 
+class Clientrarp12{
+public static void main(String args[]){
+try{
+DatagramSocket client=new DatagramSocket(); 
+InetAddress addr=InetAddress.getByName(&quot;127.0.0.1&quot;); 
+byte[] sendbyte=new byte[1024];
+byte[] receivebyte=new byte[1024];
+BufferedReader in=new BufferedReader(new InputStreamReader(System.in));
+System.out.println(&quot;Enter the Physical address (MAC):&quot;)
+String str=in.readLine();
+ sendbyte=str.getBytes();
+DatagramPacket sender=newDatagramPacket(sendbyte,sendbyte.length,addr,1309);
+client.send(sender);
+DatagramPacket receiver=new DatagramPacket(receivebyte,receivebyte.length);
+client.receive(receiver);
+String s=new String(receiver.getData());
+ System.out.println(&quot;The Logical Address is(IP): &quot;+s.trim());
+ client.close();
+}
+catch(Exception e)
+{
+
+System.out.println(e);
+}}}
+
+OUTPUT:
+
+RESULT:   Java program for simulating RARP protocols using DCP has been implemented
+successfully
+
+EXPERIMENT-10
+
+APPLICATIONS USING TCP SOCKETS
+Echo client and Echo server
+AIM: To write a java program for application using TCP Sockets Links
+PROCEDURE:
+1. Start the program.
+2. Get the frame size from the user
+3. To create the frame based on the user request.
+4. To send frames to server from the client side.
+5. If your frames reach the server it will send ACK signal to client otherwise it
+will send NACK signal to client.
+6. Stop the program
+SOURCE CODE:
+Server
+import java.net.*;
+import java.io.*;
+public class EServer
+{
+public static void main(String args[])
+{
+ServerSocket s=null;
+String line;
+DataInputStream is;
+PrintStream ps;
+Socket c=null;
+try
+{
+
+s=new ServerSocket(9000);
+}
+catch(IOException e)
+{
+}
+try
+{
+System.out.println(e);
+c=s.accept();
+is=new DataInputStream(c.getInputStream());
+ps=new PrintStream(c.getOutputStream());
+while(true)
+{
+line=is.readLine();
+ps.println(line);
+}
+}
+catch(IOException e)
+{
+System.out.println(e);
+}
+}
+}
+Client
+import java.net.*;
+import java.io.*;
+public class EClient
+
+{
+public static void main(String arg[])
+{
+Socket c=null;
+String line;
+DataInputStream is,is1;
+PrintStream os;
+try
+{
+InetAddress ia = InetAddress.getLocalHost();
+c=new Socket(ia,9000);
+}
+catch(IOException e)
+{
+}
+try
+{
+System.out.println(e);
+os=new PrintStream(c.getOutputStream());
+is=new DataInputStream(System.in);
+is1=new DataInputStream(c.getInputStream());
+while(true)
+{
+System.out.println(&quot;Client:&quot;);
+line=is.readLine();
+os.println(line);
+System.out.println(&quot;Server:&quot; + is1.readLine());
+
+ 
+}
+catch(IOException e)
+{
+System.out.println(&quot;Socket Closed!&quot;);
+ }
+} }
+
+OUTPUT:
+
+RESULT: Java program for application using TCP Sockets Links is implemented
+successfully
+
+EXPERIMENT-11
+CHAT
+
+AIM: Write a Program client –server application for chat using UDP Sockets
+PROCEDURE:
+1. Start the program.
+2.  Run UDPserver.java
+3. Enter message from server
+4. Run UDPclient.java
+5. Enter message from client.
+6. Stop the program
+ 
+SOURCE CODE:
+Server
+import java.io.*;
+import java.net.*;
+class UDPserver
+{
+public static DatagramSocket ds;
+public static byte buffer[]=new byte[1024];
+public static int clientport=789,serverport=790;
+public static void main(String args[])throws Exception
+{
+ds=new DatagramSocket(clientport);
+System.out.println(&quot;press ctrl+c to quit the program&quot;);
+BufferedReader dis=new BufferedReader(new InputStreamReader(System.in));
+InetAddress ia=InetAddress.geyLocalHost();
+while(true)
+
+{
+DatagramPacket p=new DatagramPacket(buffer,buffer.length);
+ds.receive(p);
+String psx=new String(p.getData(),0,p.getLength());
+System.out.println(&quot;Client:&quot; + psx); System.out.println(&quot;Server:&quot;);
+String str=dis.readLine();
+if(str.equals(&quot;end&quot;))
+break;
+buffer=str.getBytes();
+ds.send(newDatagramPacket(buffer,str.length(),ia,serverport));
+}}}
+Client
+import java .io.*;
+import java.net.*;
+class UDPclient{
+public static DatagramSocket ds;
+public static int clientport=789,serverport=790;
+public static void main(String args[])throws Exception
+{ byte buffer[]=new byte[1024];
+ds=new DatagramSocket(serverport);
+BufferedReader dis=new BufferedReader(new InputStreamReader(System.in));
+System.out.println(&quot;server waiting&quot;);
+InetAddress ia=InetAddress.getLocalHost();
+while(true)
+{ System.out.println(&quot;Client:&quot;);
+String str=dis.readLine();
+if(str.equals(&quot;end&quot;))
+
+break;
+buffer=str.getBytes();
+ds.send(new DatagramPacket(buffer,str.length(),ia,clientport));
+DatagramPacket p=new DatagramPacket(buffer,buffer.length);
+ds.receive(p);
+String psx=new String(p.getData(),0,p.getLength());
+System.out.println(&quot;Server:&quot; + psx);
+}}}
+OUTPUT:
+
+RESULT: Thus, the client –server application for chat using UDP Sockets is implemented
+successfully.
+
+EXPERIMENT-12
+FILE TRANSFER
+
+AIM: Write a program for transferring of files from client to server
+PROCEDURE:
+1. Start the program.
+2.  Run Serverfile.java
+3. Enter some text and store it the sample.text
+4. Run ClientFile and write the file name you want to view
+5. Text will be retrieved.
+6. Stop the program
+SOURCE CODE:
+Client
+import java.io.*;
+import java.net.*;
+import java.util.*;
+class Clientfile
+{ public static void main(String args[])
+{
+Try
+{
+BufferedReader in=new BufferedReader(new
+InputStreamReader(System.in)); Socket clsct=new Socket(&amp;quot;127.0.0.1&amp;quot;,139);
+DataInputStream din=new DataInputStream(clsct.getInputStream());
+DataOutputStream dout=new DataOutputStream(clsct.getOutputStream());
+System.out.println(&quot;Enter the new file name:&quot;);
+String str=in.readLine();
+
+dout.writeBytes(str+&#39;\n&#39;); System.out.println(&quot;Enter the new file name:&quot;);
+String str2=in.readLine();
+String str1,ss;
+FileWriter f=new
+FileWriter(str2); char buffer[];
+while(true)
+{ str1=din.readLine();
+if(str1.equals(&quot;-1&quot;)) break;
+System.out.println(str1);
+buffer=new char[str1.length()];
+str1.getChars(0,str1.length(),buffer,0);
+f.write(buffer);
+}
+f.close();
+clsct.close();
+}
+catch (Exception e)
+{ System.out.println(e);
+}}}
+Server
+import java.io.*;
+import java.net.*;
+import java.util.*;
+class Serverfile
+{ public static void main(String args[])
+{
+Try
+
+{ ServerSocket obj=new ServerSocket(139);
+while(true)
+{ Socket obj1=obj.accept();
+DataInputStream din=new DataInputStream(obj1.getInputStream());
+DataOutputStream dout=new DataOutputStream(obj1.getOutputStream());
+String str=din.readLine();
+FileReader f=new FileReader(str);
+BufferedReader b=new BufferedReader(f);
